@@ -1,4 +1,4 @@
 Name: Ayodele DAVID
 Matric number: 23CG034046
-Live URL of hosted application: [URL from Render/PythonAnywhere/etc.]
-GitHub repository link: [Your GitHub Repo Link]
+Live URL of hosted application: https://ai-project2-g7nr.onrender.com
+GitHub repository link: https://github.com/davidx345/ai-project2
