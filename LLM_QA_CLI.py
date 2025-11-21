@@ -32,7 +32,8 @@ def query_llm(prompt, api_key=None):
     
     # You can replace this with any LLM API endpoint (OpenAI, Cohere, Groq, etc.)
     # Using Hugging Face Inference API as an example
-    API_URL = "https://api-inference.huggingface.co/models/gpt2"
+    # Switched to flan-t5-base as gpt2 endpoint was returning 410 Gone
+    API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-base"
     
     if not api_key:
         # Check environment variable
