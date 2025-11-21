@@ -25,38 +25,36 @@ def preprocess_input(text):
 
 def query_llm(prompt, api_key=None):
     """
-    Sends the prompt to an LLM API.
-    Defaults to Hugging Face Inference API (GPT-2 or similar small model for demo)
-    if an API key is provided, otherwise returns a mock response.
+    Sends the prompt to Google Gemini API.
     """
-    
-    # You can replace this with any LLM API endpoint (OpenAI, Cohere, Groq, etc.)
-    # Using Hugging Face Inference API as an example
-    # Switched to flan-t5-base as gpt2 endpoint was returning 410 Gone
-    API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-base"
     
     if not api_key:
         # Check environment variable
-        api_key = os.getenv("HF_API_KEY")
+        api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
-        return "Error: No API Key provided. Please set HF_API_KEY in .env or provide it. (Mock Response: This is a simulated answer.)"
+        return "Error: No API Key provided. Please set GEMINI_API_KEY in .env. (Mock Response: This is a simulated answer.)"
 
-    headers = {"Authorization": f"Bearer {api_key}"}
-    payload = {"inputs": prompt}
+    # Gemini API Endpoint (using gemini-1.5-flash for speed/free tier)
+    API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload)
         response.raise_for_status()
         data = response.json()
         
-        # Parsing response depends on the specific API
-        if isinstance(data, list) and 'generated_text' in data[0]:
-            return data[0]['generated_text']
-        elif 'error' in data:
-            return f"API Error: {data['error']}"
-        else:
-            return str(data)
+        # Parse Gemini response
+        try:
+            return data['candidates'][0]['content']['parts'][0]['text']
+        except (KeyError, IndexError):
+            return f"API Error: Unexpected response format. {data}"
             
     except requests.exceptions.RequestException as e:
         return f"Request failed: {e}"
